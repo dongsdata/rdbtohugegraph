@@ -1,0 +1,62 @@
+# ══════════════════════════════════════════════════════════════
+# RDB → HugeGraph 매핑 설정
+#
+# 접속 정보 / 파이프라인 설정은 .env 파일에 작성하세요.
+# 이 파일은 generate_struct.py 로 Bulk Loader용 struct.json 으로 변환됩니다.
+# ══════════════════════════════════════════════════════════════
+
+# ── Vertex로 만들 테이블 ──────────────────────────────────────
+vertex_tables:
+    - class_edu_office
+    - class_fclt
+    - class_lgldong
+    - class_park
+    - class_sch
+    - class_store
+# ── Edge 정의 ─────────────────────────────────────────────────
+# via_table 있음 → 중간(관계) 테이블에서 조회
+# via_table 없음 → src_table 에서 FK 직접 조회
+#
+# edge_label : HugeGraph Edge 레이블
+# src_table  : Edge 출발 Vertex 테이블
+# src_col    : 출발 Vertex를 가리키는 컬럼
+# dst_table  : Edge 도착 Vertex 테이블
+# dst_col    : 도착 Vertex를 가리키는 컬럼
+# via_table  : 중간 테이블명 (없으면 생략)
+# props      : Edge 프로퍼티로 저장할 컬럼 (없으면 생략)
+edges:
+    # FK 직접 연결 (중간 테이블 없음)
+    - edge_label:  hasFclt
+      src_table:   class_park
+      src_col:     mng_no
+      dst_table:   class_fclt
+      dst_col:     mng_no
+      
+    # 중간 테이블이 있는 경우
+    - edge_label:  hasOffice
+      src_table:   class_sch
+      src_col:     info_pblntf_sch_cd
+      dst_table:   class_edu_office
+      dst_col:     edufc_code
+      via_table:   relation_edu_manage_sch
+      
+    - edge_label:  hasSchool
+      src_table:   class_lgldong
+      src_col:     lgldong_cd
+      dst_table:   class_sch
+      dst_col:     info_pblntf_sch_cd
+      via_table:   relation_sch_locate_dong
+
+    - edge_label:  hasStore
+      src_table:   class_lgldong
+      src_col:     lgldong_cd
+      dst_table:   class_store
+      dst_col:     sopsrt_bssh_no
+      via_table:   relation_store_dong
+      
+    - edge_label:  hasPark
+      src_table:   class_lgldong
+      src_col:     lgldong_cd
+      dst_table:   class_park
+      dst_col:     mng_no
+      via_table:   relation_park_locate_dong
