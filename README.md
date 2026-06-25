@@ -5,32 +5,26 @@
 접속 정보와 매핑 정보를 두 파일로 분리합니다.
 
 ```
-.env          → 접속 정보 + 파이프라인 설정 (Git 제외)
-mapping.yaml  → 순수 매핑 정보 (Git 공유)
-```
-
-분리한 이유:
-- 접속 정보는 환경마다 다르고 민감 정보 포함 → Git 제외 필요
-- 매핑 정보는 팀에서 공유하고 검토해야 함 → Git 관리
-- 매핑 정보는 향후 Bulk Loader의 `struct.json` 으로 변환해서 사용 가능
+.env          → 접속 정보 + 파이프라인 설정
+mapping.yaml  → 순수 매핑 정보 ```
 
 ### 1.1 .env
 
 ```bash
 # PostgreSQL
-PG_HOST=10.10.50.155
-PG_PORT=1108
-PG_DATABASE=postgres
-PG_SCHEMA=palantir_bk
-PG_USER=postgres
+PG_HOST=
+PG_PORT=
+PG_DATABASE=
+PG_SCHEMA=
+PG_USER=
 PG_PASSWORD=
 
 # HugeGraph
-HG_HOST=localhost
-HG_PORT=8080
+HG_HOST=
+HG_PORT=
 HG_GRAPHSPACE=DEFAULT
-HG_GRAPH=hugegraph
-HG_USER=admin
+HG_GRAPH=
+HG_USER=
 HG_PASSWORD=
 
 # 파이프라인
@@ -61,8 +55,6 @@ edges:
 `via_table` 있음 → 중간 테이블에서 (src_col, dst_col) 조회
 `via_table` 없음 → src_table 에서 FK 직접 조회
 
-분리하지 않고 통일한 이유는 처리 로직이 거의 같고, 사용자가 두 케이스를 별도로 구분해서 외울 필요가 없기 때문입니다.
-
 
 ## 3. Bulk Loader 호환
 
@@ -81,7 +73,7 @@ mapping.yaml + .env  →  generate_struct.py  →  struct.json
 
 ```bash
 git clone <repo>
-cd rdb_to_hugegraph
+cd pg_to_hugegraph
 
 pip install -r requirements.txt
 
@@ -113,9 +105,9 @@ bin/hugegraph-loader --graph hugegraph --file struct.json --host localhost --por
 
 ```
 rdb_to_hugegraph/
-  ├── .env                     팀원 본인 환경 (Git 제외)
-  ├── .env.example             접속 정보 양식 (Git 공유)
-  ├── mapping.yaml             테이블 매핑 정의 (Git 공유)
+  ├── .env                     Git 제외
+  ├── .env.example             접속 정보 양식
+  ├── mapping.yaml             테이블 매핑 정의 
   ├── requirements.txt
   ├── .gitignore
   │
@@ -132,7 +124,7 @@ rdb_to_hugegraph/
       └── serializer.py        타입 매핑 + 값 직렬화
 ```
 
-팀원이 수정하는 파일은 두 개입니다:
+수정해야하는 파일은 두 개입니다:
 
 | 파일 | 수정 빈도 | 내용 |
 |------|----------|------|
